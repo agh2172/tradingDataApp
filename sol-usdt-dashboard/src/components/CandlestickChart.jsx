@@ -83,33 +83,31 @@ const CandlestickChart = ({ data }) => {
                 scales: {
                     x: {
                         type: 'time',
-                        time: {
-                            unit: 'minute',
-                            tooltipFormat: 'HH:mm', // Format tooltips as HH:mm
-                        },
                         title: {
+                            color: 'white',
                             display: true,
-                            text: 'Time (minutes)',
+                            text: 'Time',
                         },
-                        min: expandedMinX, // Use expanded min value
-                        max: expandedMaxX, // Use expanded max value
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 12, // Show a maximum of 12 ticks to avoid crowding
+                        border: {
+                            color: 'white'
                         },
+                        min: expandedMinX,
+                        max: expandedMaxX,
                     },
                     y: {
                         title: {
+                            color: 'white',
                             display: true,
                             text: 'Price (USDT)',
                         },
+                        border: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'black'
+                        },
                         min: dynamicMinY,  // Set dynamic min value for the Y-axis
                         max: dynamicMaxY,  // Set dynamic max value for the Y-axis
-                    },
-                },
-                elements: {
-                    candlestick: {
-                        barThickness: 'flex', // Increase bar thickness to make single candlestick more visible
                     },
                 },
             },

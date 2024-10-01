@@ -87,17 +87,22 @@ const WebSocketComponent = () => {
 
     return (
         <div>
-            <div className="buttons-container">
-                <button onClick={() => handleIntervalChange('1m')}>1M</button>
-                <button onClick={() => handleIntervalChange('5m')}>5M</button>
-                <button onClick={() => handleIntervalChange('15m')}>15M</button>
-                <button onClick={() => handleIntervalChange('30m')}>30M</button>
-                <button onClick={() => handleIntervalChange('1h')}>1H</button>
-            </div>
             <div>
                 <h4>Current Interval: {interval}</h4>
             </div>
+            <div>
+            </div>
             <CandlestickChart data={candlestickData} />
+            <div className="buttons-container">
+                            <button onClick={() => handleIntervalChange('1m')}>1m</button>
+                            <button onClick={() => handleIntervalChange('5m')}>5m</button>
+                            <button onClick={() => handleIntervalChange('15m')}>15m</button>
+                            <button onClick={() => handleIntervalChange('30m')}>30m</button>
+                            <button onClick={() => handleIntervalChange('1h')}>1h</button>
+                            <button onClick={() => handleIntervalChange('1d')}>1d</button>
+                            <button onClick={() => handleIntervalChange('1w')}>1w</button>
+                            <button onClick={() => handleIntervalChange('1M')}>1M</button>
+                        </div>
             <OrderBook bids={bids} asks={asks} />
         </div>
     );

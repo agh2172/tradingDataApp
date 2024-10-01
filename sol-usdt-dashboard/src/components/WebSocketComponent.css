@@ -1,4 +1,5 @@
 .buttons-container {
+    margin-top: 20px;
     margin-bottom: 20px; /* Add spacing below the button container */
     display: flex;
     gap: 10px; /* Add some space between the buttons */
