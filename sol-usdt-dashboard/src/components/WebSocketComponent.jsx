@@ -9,8 +9,17 @@ const WebSocketComponent = () => {
     const [asks, setAsks] = useState([]);
     const [interval, setIntervalState] = useState('15m'); // Default interval
     const wsRef = useRef(null); // Reference for the WebSocket connection
-    const intervalRef = useRef(null); // Reference for the setInterval
+    const intervalTimerRef = useRef(null); // Reference for the setInterval
 
+    // Ref to hold the latest value of interval
+    const intervalStateRef = useRef(interval);
+
+    // Update intervalStateRef whenever interval changes
+    useEffect(() => {
+        intervalStateRef.current = interval;
+    }, [interval]);
+
+    // Establish WebSocket connection once when component mounts
     useEffect(() => {
         // Open WebSocket connection
         wsRef.current = new WebSocket("ws://localhost:8080/ws/crypto");
@@ -20,8 +29,10 @@ const WebSocketComponent = () => {
 
             // Send initial interval request when WebSocket opens
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({ type: 'setInterval', interval: '15m' })); // Default to '15m'
-                console.log("Sent initial interval request: 15m");
+                wsRef.current.send(
+                    JSON.stringify({ type: 'setInterval', interval: intervalStateRef.current })
+                ); // Use current interval
+                console.log("Sent initial interval request:", intervalStateRef.current);
             }
         };
 
@@ -59,10 +70,13 @@ const WebSocketComponent = () => {
             console.log("WebSocket connection closed:", event);
         };
 
-        intervalRef.current = setInterval(() => {
+        // Optional: Send 'setInterval' message every 60 seconds
+        intervalTimerRef.current = setInterval(() => {
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({ type: 'setInterval', interval }));
-                console.log("Sent interval update:", interval);
+                wsRef.current.send(
+                    JSON.stringify({ type: 'setInterval', interval: intervalStateRef.current })
+                );
+                console.log("Sent interval update:", intervalStateRef.current);
             }
         }, 60000); // Send message every 60 seconds
 
@@ -71,17 +85,18 @@ const WebSocketComponent = () => {
             if (wsRef.current) {
                 wsRef.current.close();
             }
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
+            if (intervalTimerRef.current) {
+                clearInterval(intervalTimerRef.current);
             }
         };
-    }, [interval]);
+    }, []); // Empty dependency array to ensure this runs only once
 
     // Handle interval change
     const handleIntervalChange = (newInterval) => {
         setIntervalState(newInterval);
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'setInterval', interval: newInterval }));
+            console.log("Sent interval change to server:", newInterval);
         }
     };
 
@@ -90,19 +105,17 @@ const WebSocketComponent = () => {
             <div>
                 <h4>Current Interval: {interval}</h4>
             </div>
-            <div>
-            </div>
             <CandlestickChart data={candlestickData} />
             <div className="buttons-container">
-                            <button onClick={() => handleIntervalChange('1m')}>1m</button>
-                            <button onClick={() => handleIntervalChange('5m')}>5m</button>
-                            <button onClick={() => handleIntervalChange('15m')}>15m</button>
-                            <button onClick={() => handleIntervalChange('30m')}>30m</button>
-                            <button onClick={() => handleIntervalChange('1h')}>1h</button>
-                            <button onClick={() => handleIntervalChange('1d')}>1d</button>
-                            <button onClick={() => handleIntervalChange('1w')}>1w</button>
-                            <button onClick={() => handleIntervalChange('1M')}>1M</button>
-                        </div>
+                <button onClick={() => handleIntervalChange('1m')}>1m</button>
+                <button onClick={() => handleIntervalChange('5m')}>5m</button>
+                <button onClick={() => handleIntervalChange('15m')}>15m</button>
+                <button onClick={() => handleIntervalChange('30m')}>30m</button>
+                <button onClick={() => handleIntervalChange('1h')}>1h</button>
+                <button onClick={() => handleIntervalChange('1d')}>1d</button>
+                <button onClick={() => handleIntervalChange('1w')}>1w</button>
+                <button onClick={() => handleIntervalChange('1M')}>1M</button>
+            </div>
             <OrderBook bids={bids} asks={asks} />
         </div>
     );
