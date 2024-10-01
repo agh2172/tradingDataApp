@@ -1,0 +1,5 @@
+.container {
+    padding-left: 30px; /* Optional: Add some padding for spacing */
+    margin: 0; /* Optional: Remove default margins */
+    height: 100%; /* Ensure it takes full height */
+}

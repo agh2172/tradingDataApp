@@ -1,0 +1,32 @@
+/* OrderBook.css */
+.orderbook-container {
+    height: 400px;  /* Fixed height of the order book container */
+    overflow-y: auto;   /* Enable vertical scrolling if content exceeds the height */
+    border: 1px solid #ccc; /* Optional: Add a border around the table */
+}
+
+table {
+    width: 100%; /* Ensure the table takes up full width */
+    border-collapse: collapse; /* Merge table borders */
+}
+
+th, td {
+    padding: 8px;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+}
+
+thead {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr {
+    height: 30px; /* Set a fixed height for table rows */
+}
