@@ -35,22 +35,57 @@ const CandlestickChart = ({ data }) => {
 
         console.log("Formatted data for chart:", formattedData);
 
+        // Ensure the min and max for Y-axis are dynamically scaled
+        const minY = formattedData.length === 1
+            ? formattedData[0].l - 1 // Subtract 1 for better visibility
+            : Math.min(...formattedData.map(c => c.l)) * 0.99;
+
+        const maxY = formattedData.length === 1
+            ? formattedData[0].h + 1 // Add 1 for better visibility
+            : Math.max(...formattedData.map(c => c.h)) * 1.01;
+
+        const minX = new Date(Math.min(...formattedData.map(c => c.x)));
+        const maxX = new Date(Math.max(...formattedData.map(c => c.x)));
+
+        // Add padding to the x-axis
+        const padding = 10 * 60 * 1000; // 10 minutes in milliseconds
+        const expandedMinX = new Date(minX.getTime() - padding);
+        const expandedMaxX = new Date(maxX.getTime() + padding);
+
+
+        console.log("Min Y:", minY, "Max Y:", maxY);
+
         chartInstanceRef.current = new Chart(ctx, {
             type: 'candlestick',
             data: {
-                datasets: [{
-                    label: 'SOL/USDT',
-                    data: formattedData,
-                }],
+                datasets: [
+                    {
+                        label: 'SOL/USDT Candlestick',
+                        data: formattedData,
+                        barThickness: 'flex', // Increase bar thickness to make single candlestick more visible
+                        backgroundColor: 'rgba(0, 255, 0, 0.5)', // Optional: color for better visibility
+                    },
+                ],
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // Disable aspect ratio maintenance
                 scales: {
                     x: {
                         type: 'time',
+                        time: {
+                            unit: 'minute',
+                            tooltipFormat: 'HH:mm', // Format tooltips as HH:mm
+                        },
                         title: {
                             display: true,
-                            text: 'Time',
+                            text: 'Time (minutes)',
+                        },
+                        min: expandedMinX, // Use expanded min value
+                        max: expandedMaxX, // Use expanded max value
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 12, // Show a maximum of 12 ticks to avoid crowding
                         },
                     },
                     y: {
@@ -58,6 +93,13 @@ const CandlestickChart = ({ data }) => {
                             display: true,
                             text: 'Price (USDT)',
                         },
+                        min: minY,  // Set dynamic min value for the Y-axis
+                        max: maxY,  // Set dynamic max value for the Y-axis
+                    },
+                },
+                elements: {
+                    candlestick: {
+                        barThickness: 'flex', // Increase bar thickness to make single candlestick more visible
                     },
                 },
             },
