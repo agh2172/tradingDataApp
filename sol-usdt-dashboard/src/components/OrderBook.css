@@ -1,4 +1,3 @@
-/* OrderBook.css */
 .orderbook-container {
     height: 400px;  /* Fixed height of the order book container */
     overflow-y: auto;   /* Enable vertical scrolling if content exceeds the height */
@@ -14,19 +13,33 @@ th, td {
     padding: 8px;
     text-align: right;
     border-bottom: 1px solid #ddd;
+    color: white; /* White text for better contrast */
 }
 
 thead {
-    background-color: #f2f2f2;
+    background-color: #2e2e2e; /* Darker background for the table header */
     position: sticky;
     top: 0;
     z-index: 1;
+    color: #ffffff; /* White text for the table header */
 }
 
 tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #f9f9f9; /* Optional: Alternate row background */
 }
 
 tbody tr {
     height: 30px; /* Set a fixed height for table rows */
+}
+
+/* Bids styling (muted blue) */
+.bid-row {
+    background-color: #4a90e2; /* Muted blue background */
+    color: #ffffff; /* White text for contrast */
+}
+
+/* Asks styling (muted red) */
+.ask-row {
+    background-color: #e24a4a; /* Muted red background */
+    color: #ffffff; /* White text for contrast */
 }

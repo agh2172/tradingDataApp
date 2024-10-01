@@ -1,32 +1,40 @@
 import React, { useEffect, useState, useRef } from 'react';
 import CandlestickChart from './CandlestickChart';
 import OrderBook from './OrderBook';
+import './WebSocketComponent.css';
 
 const WebSocketComponent = () => {
     const [candlestickData, setCandlestickData] = useState([]);
     const [bids, setBids] = useState([]);
     const [asks, setAsks] = useState([]);
-    const [interval, setInterval] = useState('15m'); // Default interval
+    const [interval, setIntervalState] = useState('15m'); // Default interval
     const wsRef = useRef(null); // Reference for the WebSocket connection
+    const intervalRef = useRef(null); // Reference for the setInterval
 
     useEffect(() => {
+        // Open WebSocket connection
         wsRef.current = new WebSocket("ws://localhost:8080/ws/crypto");
 
         wsRef.current.onopen = () => {
             console.log("WebSocket connection established.");
+
+            // Send initial interval request when WebSocket opens
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({ type: 'setInterval', interval: '15m' })); // Default to '15m'
+                console.log("Sent initial interval request: 15m");
+            }
         };
 
         wsRef.current.onmessage = (event) => {
             console.log("Raw data received:", event.data);
             try {
                 const parsedData = JSON.parse(event.data);
-                console.log("Parsed data:", parsedData); // Log the parsed data
+                console.log("Parsed data:", parsedData);
 
                 // Handle candlestick data
                 if (parsedData.type === "candlestick" || parsedData.type === "historical") {
-                    if (Array.isArray(parsedData.data.data)) { // Adjust this line
-                        console.log("Updating candlestick data:", parsedData.data.data); // Log the updated data
-                        setCandlestickData(parsedData.data.data); // Trigger chart re-render
+                    if (Array.isArray(parsedData.data.data)) {
+                        setCandlestickData(parsedData.data.data); // Trigger chart re-render with real data
                     } else {
                         console.error("Expected an array for candlestick data, but got:", parsedData.data.data);
                     }
@@ -35,15 +43,13 @@ const WebSocketComponent = () => {
                 // Handle order book data (depth)
                 if (parsedData.type === "orderBook") {
                     const { b: newBids, a: newAsks } = parsedData.data;
-                    setBids(newBids || []); // Ensure bids are set
-                    setAsks(newAsks || []); // Ensure asks are set
+                    setBids(newBids || []);
+                    setAsks(newAsks || []);
                 }
             } catch (error) {
                 console.error("Failed to parse JSON:", error);
             }
         };
-
-
 
         wsRef.current.onerror = (error) => {
             console.error("WebSocket error observed:", error);
@@ -53,22 +59,27 @@ const WebSocketComponent = () => {
             console.log("WebSocket connection closed:", event);
         };
 
-        // Cleanup on component unmount
+        intervalRef.current = setInterval(() => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({ type: 'setInterval', interval }));
+                console.log("Sent interval update:", interval);
+            }
+        }, 60000); // Send message every 60 seconds
+
+        // Cleanup WebSocket and intervals when the component unmounts
         return () => {
-            console.log("Closing WebSocket connection...");
             if (wsRef.current) {
                 wsRef.current.close();
             }
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
         };
-    }, []);
+    }, [interval]);
 
-    // Define the function to handle interval changes
+    // Handle interval change
     const handleIntervalChange = (newInterval) => {
-        setInterval(newInterval);
-        // Log the new interval
-        console.log("Interval changed to:", newInterval);
-
-        // Send the new interval to the server
+        setIntervalState(newInterval);
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'setInterval', interval: newInterval }));
         }
@@ -76,7 +87,7 @@ const WebSocketComponent = () => {
 
     return (
         <div>
-            <div>
+            <div className="buttons-container">
                 <button onClick={() => handleIntervalChange('1m')}>1M</button>
                 <button onClick={() => handleIntervalChange('5m')}>5M</button>
                 <button onClick={() => handleIntervalChange('15m')}>15M</button>
@@ -84,7 +95,7 @@ const WebSocketComponent = () => {
                 <button onClick={() => handleIntervalChange('1h')}>1H</button>
             </div>
             <div>
-                <h4>Current Interval: {interval}</h4> {/* Optional: Displaying the current interval */}
+                <h4>Current Interval: {interval}</h4>
             </div>
             <CandlestickChart data={candlestickData} />
             <OrderBook bids={bids} asks={asks} />

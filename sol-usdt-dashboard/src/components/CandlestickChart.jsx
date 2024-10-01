@@ -36,19 +36,29 @@ const CandlestickChart = ({ data }) => {
         console.log("Formatted data for chart:", formattedData);
 
         // Ensure the min and max for Y-axis are dynamically scaled
-        const minY = formattedData.length === 1
-            ? formattedData[0].l - 1 // Subtract 1 for better visibility
-            : Math.min(...formattedData.map(c => c.l)) * 0.99;
+        const minY = Math.min(...formattedData.map(c => c.l));
+        const maxY = Math.max(...formattedData.map(c => c.h));
 
-        const maxY = formattedData.length === 1
-            ? formattedData[0].h + 1 // Add 1 for better visibility
-            : Math.max(...formattedData.map(c => c.h)) * 1.01;
+         // Calculate the price range
+         const priceRange = maxY - minY;
+
+         // Set dynamic padding as a percentage of the price range (e.g., 5%)
+         const yPadding = priceRange * 0.05;
+
+         // Apply the dynamic padding to the Y-axis range
+         const dynamicMinY = minY - yPadding;
+         const dynamicMaxY = maxY + yPadding;
 
         const minX = new Date(Math.min(...formattedData.map(c => c.x)));
         const maxX = new Date(Math.max(...formattedData.map(c => c.x)));
 
-        // Add padding to the x-axis
-        const padding = 10 * 60 * 1000; // 10 minutes in milliseconds
+        // Calculate the time range between the minimum and maximum x-values
+        const timeRange = maxX.getTime() - minX.getTime();
+
+        // Set dynamic padding as a percentage of the time range (e.g., 5%)
+        const padding = timeRange * 0.01;
+
+        // Apply the dynamic padding to the x-axis range
         const expandedMinX = new Date(minX.getTime() - padding);
         const expandedMaxX = new Date(maxX.getTime() + padding);
 
@@ -93,8 +103,8 @@ const CandlestickChart = ({ data }) => {
                             display: true,
                             text: 'Price (USDT)',
                         },
-                        min: minY,  // Set dynamic min value for the Y-axis
-                        max: maxY,  // Set dynamic max value for the Y-axis
+                        min: dynamicMinY,  // Set dynamic min value for the Y-axis
+                        max: dynamicMaxY,  // Set dynamic max value for the Y-axis
                     },
                 },
                 elements: {

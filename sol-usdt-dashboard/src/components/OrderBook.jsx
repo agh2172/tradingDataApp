@@ -24,10 +24,17 @@ const OrderBook = ({ bids = [], asks = [] }) => {
                             // Show up to 30 rows, with a scrollbar if there are more
                             bids.map((bid, index) => (
                                 <tr key={index}>
-                                    <td>{parseFloat(bid[0]).toFixed(2)}</td>
-                                    <td>{parseFloat(bid[1]).toFixed(4)}</td>
-                                    <td>{asks[index] ? parseFloat(asks[index][0]).toFixed(2) : ''}</td>
-                                    <td>{asks[index] ? parseFloat(asks[index][1]).toFixed(4) : ''}</td>
+                                    {/* Bids row with blue background */}
+                                    <td className="bid-row">{parseFloat(bid[0]).toFixed(2)}</td>
+                                    <td className="bid-row">{parseFloat(bid[1]).toFixed(4)}</td>
+
+                                    {/* Asks row with red background */}
+                                    <td className="ask-row">
+                                        {asks[index] ? parseFloat(asks[index][0]).toFixed(2) : ''}
+                                    </td>
+                                    <td className="ask-row">
+                                        {asks[index] ? parseFloat(asks[index][1]).toFixed(4) : ''}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
