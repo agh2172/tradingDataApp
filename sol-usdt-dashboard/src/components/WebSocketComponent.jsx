@@ -67,7 +67,7 @@ const WebSocketComponent = () => {
         setInterval(newInterval);
         // Log the new interval
         console.log("Interval changed to:", newInterval);
-        
+
         // Send the new interval to the server
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'setInterval', interval: newInterval }));
