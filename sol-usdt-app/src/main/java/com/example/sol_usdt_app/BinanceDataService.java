@@ -13,11 +13,12 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+//Data service for binance
 public class BinanceDataService {
 
     private com.example.sol_usdt_app.BinanceWebSocketClient depthClient;
     private com.example.sol_usdt_app.BinanceWebSocketClient candlestickClient;
-    private String currentInterval = "15m"; // default interval
+    private String currentInterval = "15m"; //default interval
 
     public BinanceDataService() {
     }
@@ -39,6 +40,7 @@ public class BinanceDataService {
 
         List<List<Object>> historicalData = new ArrayList<>();
 
+        //Format into JSON as expected by front end
         for (JsonNode kline : rootNode) {
             List<Object> candle = new ArrayList<>();
             candle.add(kline.get(0).asLong());   // Open time
@@ -54,18 +56,18 @@ public class BinanceDataService {
 
     // Connect to Binance WebSocket streams for depth and candlestick data
     public void connectToBinance(CryptoWebSocketHandler handler) throws URISyntaxException {
-        // For 'depth' data
+        // For depth (order book) data
         String depthStreamUrl = "wss://stream.binance.com:9443/ws/solusdt@depth";
         depthClient = new BinanceWebSocketClient(depthStreamUrl, handler, "depth");
         depthClient.connect();
 
-        // For 'candlestick' data
+        // For candlestick data
         String candlestickStreamUrl = String.format("wss://stream.binance.com:9443/ws/solusdt@kline_%s", currentInterval);
         candlestickClient = new BinanceWebSocketClient(candlestickStreamUrl, handler, "candlestick");
         candlestickClient.connect();
     }
 
-    // Fetch and send the latest candlestick data to the client
+    // Fetch and send the latest candlestick data to the front end
     public void fetchAndSendCandlestickData(CryptoWebSocketHandler handler) throws IOException, InterruptedException {
         // Fetch the latest candlestick data
         List<List<Object>> historicalData = fetchHistoricalCandlestickData("SOLUSDT", currentInterval);
@@ -87,7 +89,7 @@ public class BinanceDataService {
         }
     }
 
-    // Update the interval and reconnect to the candlestick stream
+    // Update the interval for candlestick data and reconnect to the candlestick stream
     public void updateInterval(String newInterval, CryptoWebSocketHandler handler) throws URISyntaxException {
         this.currentInterval = newInterval;
 

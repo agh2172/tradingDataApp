@@ -23,6 +23,7 @@ public class BinanceWebSocketClient extends WebSocketClient {
         System.out.println("Connected to Binance WebSocket for " + streamType + " data");
     }
 
+    // Recieves data from binance and passes to the front end web socket handler
     @Override
     public void onMessage(String message) {
         //System.out.println("Received message from Binance (" + streamType + "): " + message);

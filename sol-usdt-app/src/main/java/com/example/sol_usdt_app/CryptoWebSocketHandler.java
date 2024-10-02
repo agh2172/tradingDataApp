@@ -29,7 +29,7 @@ public class CryptoWebSocketHandler extends TextWebSocketHandler {
         this.session = session;
         System.out.println("WebSocket connection established with client!");
 
-        // Fetch historical data for the last 2 hours (15-minute interval)
+        // Fetch historical data on default interval (15-minutes)
         List<List<Object>> historicalData = binanceDataService.fetchHistoricalCandlestickData("SOLUSDT", currentInterval);
 
         // Format the historical data to be sent as a message
@@ -61,7 +61,7 @@ public class CryptoWebSocketHandler extends TextWebSocketHandler {
         return sb.toString();
     }
 
-    // This is the missing method to send any message to the client
+    // Send messages to the front end
     public void sendMessageToClient(String message, String streamType) throws IOException {
         if (session != null && session.isOpen()) {
             String formattedMessage = String.format("{\"type\": \"%s\", \"data\": %s}", streamType, message);
@@ -85,6 +85,7 @@ public class CryptoWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    // Method that handles interval updates from the front end
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         System.out.println("Received message from client: " + message.getPayload());
@@ -108,10 +109,9 @@ public class CryptoWebSocketHandler extends TextWebSocketHandler {
                 e.printStackTrace();
             }
         }
-        // Optionally handle other client messages here
     }
 
-    // Move this method inside the class
+    // Helper method to parse interval update message
     private String parseNewInterval(String jsonMessage) {
         // Use a JSON library (like Jackson) to parse the JSON message
         ObjectMapper objectMapper = new ObjectMapper();

@@ -6,9 +6,11 @@ import org.springframework.web.socket.config.annotation.*;
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
+
+    //websocket for the front end to connect to
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new CryptoWebSocketHandler(), "/ws/crypto")
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("*"); //all origins allowed for development server
     }
 }
