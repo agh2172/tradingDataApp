@@ -1,5 +1,5 @@
 import React from 'react';
-import './OrderBook.css'; // Import the CSS for styling the table
+import './OrderBook.css';
 
 const OrderBook = ({ bids = [], asks = [] }) => {
     return (
@@ -21,7 +21,7 @@ const OrderBook = ({ bids = [], asks = [] }) => {
                     </thead>
                     <tbody>
                         {bids.length > 0 || asks.length > 0 ? (
-                            // Show up to 30 rows, with a scrollbar if there are more
+                            //Show up to 30 rows, with a scrollbar if there are more
                             bids.map((bid, index) => (
                                 <tr key={index}>
                                     {/* Bids row with blue background */}
